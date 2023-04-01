@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Article;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,12 +17,28 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $articles = App\Models\Article::all();
+    return view('pages.mainPage', ['articles'=>$articles]);
 });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/addArticle', function(){
+    return view('pages.addArticle');
+});
+Route::post('/addArticle', function(Request $request){
+    $title = $request->title;
+    $content = $request->contentField;
+    $author = $request->author;
+    $article = new App\Models\Article();
+    $article->title = $title;
+    $article->content = $content;
+    $article->author = $author;
+    $article->save();
+    return "Статья добавлена";
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
